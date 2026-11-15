@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SmartVitals AI | Mission Health</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#07111f;--panel:#101e30;--panel2:#14263b;--line:#263c54;--text:#eaf3ff;--muted:#91a8c1;--cyan:#50d9e8;--green:#53d69a;--amber:#ffca68;--red:#ff6878}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0%,#173453 0,#07111f 42%);color:var(--text);font:14px Inter,Segoe UI,Arial,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;padding:20px 4%;border-bottom:1px solid var(--line);background:#07111fbb;position:sticky;top:0;z-index:3;backdrop-filter:blur(12px)}
+.brand{font-size:19px;font-weight:800;letter-spacing:1.5px}.brand span{color:var(--cyan)}.sub{color:var(--muted);font-size:11px;letter-spacing:2px;margin-top:4px}
+.pills{display:flex;gap:9px;flex-wrap:wrap}.pill{border:1px solid var(--line);padding:8px 11px;border-radius:30px;color:var(--muted);font-size:11px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px}
+main{max-width:1440px;margin:auto;padding:25px 4% 50px}.top{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:22px}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:2px}.title{font-size:27px;margin:7px 0}.muted{color:var(--muted)}.actions{display:flex;gap:9px;flex-wrap:wrap}
+button{background:var(--panel2);color:var(--text);border:1px solid var(--line);padding:10px 13px;border-radius:8px;cursor:pointer;font-weight:650}button:hover{border-color:var(--cyan)}button.primary{background:#0e5263;border-color:#267d8c}button.danger{border-color:#803d4c;color:#ff9ba5}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:linear-gradient(145deg,#14263b,#0e1b2b);border:1px solid var(--line);border-radius:13px;padding:17px;min-width:0}.label{color:var(--muted);font-size:11px;letter-spacing:1.4px}.value{font-size:32px;font-weight:750;margin:13px 0 5px}.unit{font-size:13px;color:var(--muted);font-weight:500}.delta{font-size:11px;color:var(--muted)}.cyan{color:var(--cyan)}.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}
+.layout{display:grid;grid-template-columns:1.55fr 1fr;gap:14px;margin-top:14px}.chartbox{height:270px}.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.sectionhead h3{margin:0;font-size:14px}.tag{font-size:10px;color:var(--cyan);border:1px solid #285466;border-radius:20px;padding:5px 8px}
+.alert{border-left:3px solid var(--green);background:#102b2a;padding:14px;border-radius:8px;margin:12px 0}.alert.bad{border-color:var(--red);background:#321d2a}.alert strong{display:block;margin-bottom:5px}.alert p{margin:0;color:#b6c9d9;line-height:1.5;font-size:12px}
+.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #21364b;color:var(--muted);font-size:12px}.row b{color:var(--text);font-weight:600}
+.history{margin-top:14px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}th,td{text-align:left;padding:11px;border-bottom:1px solid #22374d}th{color:var(--muted);font-weight:600}td{color:#d7e5f2}.badge{padding:4px 8px;border-radius:20px;font-size:10px}.ok{background:#153d35;color:#6ce0ad}.badbadge{background:#4a202c;color:#ff8996}
+footer{text-align:center;color:#68829d;font-size:10px;padding:25px}.notice{margin-top:15px;color:#8ca4bd;font-size:11px;line-height:1.6}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.top{align-items:start;flex-direction:column}}@media(max-width:520px){header{align-items:start;gap:12px;flex-direction:column}.grid{grid-template-columns:1fr 1fr}.value{font-size:25px}.title{font-size:22px}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">SMARTVITALS <span>AI</span></div><div class="sub">AUTONOMOUS CREW HEALTH MONITOR</div></div>
+<div class="pills"><div class="pill"><i class="dot"></i>LOCAL AI ACTIVE</div><div class="pill" id="earthPill">EARTH LINK: DELAYED</div><div class="pill">MISSION SIMULATION</div></div></header>
+<main>
+<div class="top"><div><div class="eyebrow">MISSION CONTROL / CREW MEDICAL</div><h1 class="title">Astronaut Health Overview</h1><div class="muted" id="missionLine">MARS EXPEDITION // ASTRONAUT 01</div></div>
+<div class="actions"><button class="primary" onclick="testAlert()">⚡ Test anomaly alert</button><button onclick="toggleEarth()" id="earthBtn">Simulate Earth link: OFF</button><button onclick="toggleSim()" id="simBtn">Pause stream</button></div></div>
+<section class="grid">
+<div class="card"><div class="label">HEART RATE</div><div class="value" id="hr">-- <span class="unit">BPM</span></div><div class="delta">Live simulated telemetry</div></div>
+<div class="card"><div class="label">OXYGEN SATURATION</div><div class="value" id="spo2">-- <span class="unit">%</span></div><div class="delta">SpO₂ estimate · simulated</div></div>
+<div class="card"><div class="label">CORE TEMPERATURE</div><div class="value" id="temp">-- <span class="unit">°C</span></div><div class="delta">Simulated sensor channel</div></div>
+<div class="card"><div class="label">STRESS INDEX</div><div class="value" id="stress">-- <span class="unit">/ 100</span></div><div class="delta">Synthetic score · not a direct measurement</div></div>
+</section>
+<section class="layout">
+<div class="card"><div class="sectionhead"><h3>VITAL TELEMETRY</h3><span class="tag">LIVE · LAST 40 READINGS</span></div><div class="chartbox"><canvas id="chart"></canvas></div></div>
+<div class="card"><div class="sectionhead"><h3>LOCAL AI ASSESSMENT</h3><span class="tag">EDGE INFERENCE</span></div>
+<div id="alertBox" class="alert"><strong class="green">SYSTEM NOMINAL</strong><p>Waiting for telemetry...</p></div>
+<div class="row"><span>ML engine</span><b class="green">Isolation Forest</b></div><div class="row"><span>Inference mode</span><b>Local / offline</b></div><div class="row"><span>Database</span><b class="green">SQLite · active</b></div><div class="row"><span>Earth communication</span><b id="earthStatus">Delayed / simulated</b></div><div class="row"><span>Total readings</span><b id="count">0</b></div><div class="row"><span>Alerts logged</span><b id="alerts">0</b></div>
+</div></section>
+<section class="card history"><div class="sectionhead"><h3>MISSION EVENT LOG</h3><span class="tag">PERSISTED LOCALLY</span></div><div class="tablewrap"><table><thead><tr><th>TIME (UTC)</th><th>HEART RATE</th><th>SpO₂</th><th>TEMP</th><th>STRESS</th><th>AI STATUS</th></tr></thead><tbody id="history"><tr><td colspan="6" class="muted">Waiting for readings…</td></tr></tbody></table></div><div class="notice">Prototype notice: all readings are synthetic and the model is trained on synthetic baseline data. This is a hackathon demonstration, not a medical device, diagnosis, or source of treatment instructions. Alerts require review by qualified crew medical personnel and approved mission protocols.</div></section>
+</main><footer>SMARTVITALS AI · OFFLINE-FIRST SPACE HEALTH DEMONSTRATOR · BUILD 1.0</footer>
+<script>
+let running=true, earth=false, chart;
+const $=id=>document.getElementById(id);
+const labels=[], hrData=[], oxData=[];
+function initChart(){chart=new Chart($('chart'),{type:'line',data:{labels, datasets:[
+{label:'Heart rate (BPM)',data:hrData,borderColor:'#50d9e8',backgroundColor:'#50d9e822',tension:.3,pointRadius:0,yAxisID:'y'},
+{label:'SpO₂ (%)',data:oxData,borderColor:'#53d69a',backgroundColor:'#53d69a22',tension:.3,pointRadius:0,yAxisID:'y1'}]},
+options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:'#a9bfd3',boxWidth:10,font:{size:10}}}},scales:{x:{ticks:{color:'#718ba4',maxTicksLimit:6},grid:{color:'#20354a'}},y:{position:'left',ticks:{color:'#50d9e8'},grid:{color:'#20354a'}},y1:{position:'right',min:85,max:100,ticks:{color:'#53d69a'},grid:{drawOnChartArea:false}}}}});}
+function timeOf(s){return new Date(s).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})}
+function setValue(id,v,unit,cls){$(id).innerHTML=v+' <span class="unit">'+unit+'</span>';$(id).className='value '+(cls||'')}
+function updateReading(d){
+ setValue('hr',d.heart_rate,'BPM',d.heart_rate>110?'red':'cyan');setValue('spo2',d.spo2,'% ',d.spo2<93?'red':'green');
+ setValue('temp',d.temperature,'°C',d.temperature>38?'amber':'cyan');setValue('stress',d.stress,'/ 100',d.stress>70?'amber':'cyan');
+ let t=timeOf(d.timestamp);labels.push(t);hrData.push(d.heart_rate);oxData.push(d.spo2);if(labels.length>40){labels.shift();hrData.shift();oxData.shift()}chart.update('none');
+ const box=$('alertBox');if(d.anomaly){box.className='alert bad';box.innerHTML='<strong class="red">⚠ UNUSUAL PATTERN DETECTED</strong><p>'+d.note+'<br>Readings have been stored locally. Consult approved crew medical protocol; this prototype does not provide diagnosis or treatment.</p>'}
+ else{box.className='alert';box.innerHTML='<strong class="green">✓ SYSTEM NOMINAL</strong><p>'+d.note+'</p>'}
+}
+async function poll(){if(!running)return;try{let d=await fetch('/api/vitals').then(r=>r.json());if(d.heart_rate!==undefined)updateReading(d);await refreshHistory()}catch(e){$('alertBox').innerHTML='<strong class="amber">BACKEND CONNECTION LOST</strong><p>Local dashboard cannot reach the API.</p>'}}
+async function refreshHistory(){let [rows,sum]=await Promise.all([fetch('/api/history?limit=12').then(r=>r.json()),fetch('/api/summary').then(r=>r.json())]);$('count').textContent=sum.readings;$('alerts').textContent=sum.alerts;$('history').innerHTML=rows.slice().reverse().map(r=>`<tr><td>${timeOf(r.timestamp)}</td><td>${r.heart_rate}</td><td>${r.spo2}%</td><td>${r.temperature}°</td><td>${r.stress}</td><td><span class="badge ${r.anomaly?'badbadge':'ok'}">${r.status}</span></td></tr>`).join('')||'<tr><td colspan="6">No readings yet</td></tr>'}
+async function testAlert(){await fetch('/api/test-alert',{method:'POST'});running=true;$('simBtn').textContent='Pause stream';poll()}
+async function toggleEarth(){earth=!earth;await fetch('/api/controls',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({earth_connected:earth})});$('earthBtn').textContent='Simulate Earth link: '+(earth?'ON':'OFF');$('earthPill').textContent='EARTH LINK: '+(earth?'CONNECTED':'DELAYED');$('earthStatus').textContent=earth?'Connected (simulated)':'Delayed / simulated'}
+async function toggleSim(){running=!running;await fetch('/api/controls',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({simulation:running})});$('simBtn').textContent=running?'Pause stream':'Resume stream';if(running)poll()}
+initChart();poll();setInterval(poll,1800);setInterval(refreshHistory,5000);
+</script></body></html>
