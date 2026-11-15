@@ -32,6 +32,18 @@ uv run --python .venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.
 
 Then open `http://127.0.0.1:8000` in your browser.
 
+## Host the dashboard on GitHub Pages
+The dashboard automatically switches to a standalone demo on GitHub Pages. It generates synthetic readings in the browser, saves the recent history in that browser's local storage, and does not need the Python backend. The chart library is loaded from a CDN, so visitors need an internet connection to load the chart.
+
+To publish it from this repository:
+1. Copy `frontend/index.html` to the repository root and name the copy `index.html` (keep the original in place for the local backend).
+2. Push the change to GitHub.
+3. In the repository, open **Settings → Pages**.
+4. Under **Build and deployment**, choose **Deploy from a branch**, select your branch (usually `main`) and the `/(root)` folder, then click **Save**.
+5. After GitHub finishes publishing, open the Pages URL shown on that settings page.
+
+GitHub Pages' branch-based setup publishes from the repository root or a `/docs` folder, not the existing `/frontend` folder, which is why the copy is needed. The standalone demo's history is per-browser and is separate from the backend's SQLite database.
+
 ## Demo controls
 - **Test anomaly alert**: injects one unusual synthetic reading on the next update.
 - **Simulate Earth link**: toggles the displayed connection state. Local monitoring continues either way.
